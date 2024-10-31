@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.8.0",
+    "@iconify-json/carbon": "^1.2.4",
     "@vitejs/plugin-vue": "^5.0.4",
     "electron": "^30.0.1",
     "electron-builder": "^24.13.3",

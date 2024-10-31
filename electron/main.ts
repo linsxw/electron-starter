@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -27,11 +27,13 @@ let win: BrowserWindow | null
 function createWindow() {
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+    // 关闭顶部菜单
+    autoHideMenuBar: true,
+    // 无边框
+    frame: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
-    // 关闭顶部菜单
-    autoHideMenuBar: true,
   })
 
   // Test active push message to Renderer-process.
@@ -46,6 +48,30 @@ function createWindow() {
     // win.loadFile('dist/index.html')
     win.loadFile(path.join(RENDERER_DIST, 'index.html'))
   }
+  // 可选：打开开发者工具
+  win.webContents.openDevTools()
+
+  // 处理窗口操作
+  ipcMain.on('window-minimize', () => {
+    win.minimize()
+  })
+
+  ipcMain.on('window-maximize', () => {
+    if (win.isMaximized()) {
+      win.unmaximize()
+    }
+    else {
+      win.maximize()
+    }
+  })
+
+  ipcMain.on('window-close', () => {
+    win.close()
+  })
+
+  ipcMain.on('window-position', (event, { x, y }) => {
+    win.setPosition(x, y)
+  })
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
